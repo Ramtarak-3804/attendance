@@ -31,10 +31,22 @@ public class ReportService {
         List<AttendanceRecord> records = attendanceRepository.findByUserBetween(userId, from, to);
         Map<AttendanceStatus, Long> counts = new EnumMap<>(AttendanceStatus.class);
         Duration totalWorked = Duration.ZERO;
+        Duration totalOvertime = Duration.ZERO;
+        long overtimeDays = 0;
+        Duration standardWorkDay = AttendanceReport.getStandardWorkDay();
+
         for (AttendanceRecord record : records) {
             counts.put(record.getStatus(), counts.getOrDefault(record.getStatus(), 0L) + 1);
-            totalWorked = totalWorked.plus(record.workedDuration());
+            Duration dailyWorked = record.workedDuration();
+            totalWorked = totalWorked.plus(dailyWorked);
+
+            // Calculate overtime for this day
+            if (dailyWorked.compareTo(standardWorkDay) > 0) {
+                Duration dailyOvertime = dailyWorked.minus(standardWorkDay);
+                totalOvertime = totalOvertime.plus(dailyOvertime);
+                overtimeDays++;
+            }
         }
-        return new AttendanceReport(user, from, to, counts, totalWorked, records.size());
+        return new AttendanceReport(user, from, to, counts, totalWorked, totalOvertime, records.size(), overtimeDays);
     }
 }

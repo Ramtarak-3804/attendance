@@ -13,8 +13,7 @@ public class App {
         AttendanceService attendanceService = new AttendanceService(
                 attendanceRepository,
                 userRepository,
-                policy
-        );
+                policy);
         ReportService reportService = new ReportService(attendanceRepository, userRepository);
 
         User alice = new User("U100", "Alice Patel", Role.EMPLOYEE);
@@ -36,8 +35,7 @@ public class App {
         AttendanceReport report = reportService.generateUserReport(
                 "U100",
                 yesterday,
-                today
-        );
+                today);
 
         System.out.println("Report for " + report.getUser().getName());
         System.out.println("Range: " + report.getFrom() + " to " + report.getTo());
@@ -47,5 +45,8 @@ public class App {
         System.out.println("Absent: " + report.getCount(AttendanceStatus.ABSENT));
         System.out.println("On leave: " + report.getCount(AttendanceStatus.ON_LEAVE));
         System.out.println("Total worked: " + report.getTotalWorked());
+        System.out.println("--- Overtime Statistics ---");
+        System.out.println("Overtime days: " + report.getOvertimeDays());
+        System.out.println("Total overtime: " + report.getTotalOvertime());
     }
 }
